@@ -1,0 +1,8 @@
+FROM tiangolo/uvicorn-gunicorn-fastapi:python3.7
+ENV ENV prod
+COPY ./app /app
+# 如果docker-compose_pd.yml command 你還要額外寫的話 就要把pd_start.sh 一起加上去
+COPY ./pd_start.sh /app/pd_start.sh
+WORKDIR /app
+RUN chmod a+x pd_start.sh
+RUN pip install -r requirements.txt

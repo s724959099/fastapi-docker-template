@@ -1,0 +1,9 @@
+version: '3'
+services:
+  web:
+    container_name: fastapi-web
+    build: .
+    ports:
+      - "5000:5000"
+    volumes:
+      - ./app:/app

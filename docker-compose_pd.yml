@@ -1,0 +1,15 @@
+version: '3'
+services:
+  web:
+    sysctls:
+      net.core.somaxconn: 32768
+    container_name: fastapi-web_pd
+    build:
+      context: .
+      dockerfile: Dockerfile_pd
+    volumes:
+      - ./app:/app
+    ports:
+      - '80:80'
+#    command: >
+#      bash -c "others & ./pd_start.sh"
