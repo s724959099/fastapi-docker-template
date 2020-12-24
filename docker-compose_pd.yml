@@ -56,5 +56,7 @@ services:
       - traefik.http.routers.to-https.middlewares=to-https
       - traefik.http.middlewares.to-https.redirectscheme.scheme=https
 
+      # traefik auth
+      - traefik.http.routers.http_catchall.middlewares=auth
       - traefik.http.middlewares.auth.basicauth.users=${TRAEFIK_USER}:${TRAEFIK_PASSWORD_HASH}
 

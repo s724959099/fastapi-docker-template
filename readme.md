@@ -16,6 +16,11 @@ DOMAIN=mb0520-demo.ml
 EMAIL=meatball0520@gmail.com
 TRAEFIK_USER=admin
 TRAEFIK_PASSWORD_HASH=$2y$10$zi5n43jq9S63gBqSJwHTH.nCai2vB0SW/ABPGg2jSGmJBVRo0A.ni # admin
+
+
+# 如果你要新增一筆賬號密碼 可以這樣設定
+echo $(htpasswd -nb user password) | sed -e s/\\$/\\$\\$/g
+# user:$$apr1$$nRnH1WwB$$UKQfB0zrDIKhocuSxc/tE.
 ```
 
 ### 建立憑證資訊
@@ -25,7 +30,6 @@ chmod 600 acme.json
 ```
 
 ## 還未完成的事情
-- [ ] 將traefik 改成auth
 - [ ] 理解trafik dashboard
 - [ ] docker-compose.local.yml (for local traefik)
 
