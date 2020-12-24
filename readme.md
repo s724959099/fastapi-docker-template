@@ -30,6 +30,5 @@ chmod 600 acme.json
 ```
 
 ## 還未完成的事情
-- [ ] 理解trafik dashboard
 - [ ] docker-compose.local.yml (for local traefik)
 
