@@ -9,8 +9,6 @@ services:
       dockerfile: Dockerfile_pd
     volumes:
       - ./app:/app
-    ports:
-      - '80:80'
     # command: >
     # bash -c "others & ./pd_start.sh"
 
