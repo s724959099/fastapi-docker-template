@@ -11,5 +11,54 @@ services:
       - ./app:/app
     ports:
       - '80:80'
-#    command: >
-#      bash -c "others & ./pd_start.sh"
+  #    command: >
+  #      bash -c "others & ./pd_start.sh"
+
+    labels:
+      # Uncomment to fetch Let's Encrypt certificates.
+      # Make sure you set up DNS records and they point to your IP.
+      - traefik.http.routers.https.rule=Host(`${DOMAIN}`)
+      - traefik.http.routers.https.entrypoints=https
+      - traefik.http.routers.https.tls=true
+      - traefik.http.routers.traefik-https.tls.certresolver=letsencrypt
+
+
+  traefik:
+    container_name: traefik
+    image: traefik:v2.0
+    command:
+      - "--api.insecure=true"
+      - "--providers.docker=true"
+      - "--entryPoints.web.address=:80"
+      - "--entryPoints.websecure.address=:443"
+      - "--certificatesResolvers.le.acme.email=${EMAIL}"
+      - "--certificatesResolvers.le.acme.storage=acme.json"
+      - "--certificatesResolvers.le.acme.tlsChallenge=true"
+      - "--certificatesResolvers.le.acme.httpChallenge=true"
+      - "--certificatesResolvers.le.acme.httpChallenge.entryPoint=web"
+    restart: always
+    networks:
+      - web
+    ports:
+      - 80:80
+      - 443:443
+      - 8080:8080
+    volumes:
+      - /var/run/docker.sock:/var/run/docker.sock
+      - ./acme.json:/acme.json
+    labels:
+
+      # use subdomain to get port 8080
+      - traefik.http.routers.http_catchall.rule=Host(`traefik.${DOMAIN}`)
+
+      - traefik.http.routers.http_catchall.tls=true
+      - traefik.http.routers.http_catchall.tls.certresolver=le
+      - traefik.http.services.http_catchall.loadbalancer.server.port=8080
+
+      # Redirect all HTTP traffic to HTTPS
+      - traefik.http.routers.to-https.rule=HostRegexp(`{host:.+}`)
+      - traefik.http.routers.to-https.entrypoints=http
+      - traefik.http.routers.to-https.middlewares=to-https
+
+      - traefik.http.middlewares.auth.basicauth.users=${TRAEFIK_USER}:${TRAEFIK_PASSWORD_HASH}
+
