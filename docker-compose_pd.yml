@@ -11,8 +11,8 @@ services:
       - ./app:/app
     ports:
       - '80:80'
-  #    command: >
-  #      bash -c "others & ./pd_start.sh"
+    # command: >
+    # bash -c "others & ./pd_start.sh"
 
     labels:
       # Uncomment to fetch Let's Encrypt certificates.
@@ -37,8 +37,6 @@ services:
       - "--certificatesResolvers.le.acme.httpChallenge=true"
       - "--certificatesResolvers.le.acme.httpChallenge.entryPoint=web"
     restart: always
-    networks:
-      - web
     ports:
       - 80:80
       - 443:443
