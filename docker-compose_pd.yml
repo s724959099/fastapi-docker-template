@@ -16,9 +16,8 @@ services:
       # Uncomment to fetch Let's Encrypt certificates.
       # Make sure you set up DNS records and they point to your IP.
       - traefik.http.routers.https.rule=Host(`${DOMAIN}`)
-      - traefik.http.routers.https.entrypoints=https
       - traefik.http.routers.https.tls=true
-      - traefik.http.routers.traefik-https.tls.certresolver=letsencrypt
+      - traefik.http.routers.https.tls.certresolver=le
 
 
   traefik:
@@ -52,9 +51,9 @@ services:
       - traefik.http.services.http_catchall.loadbalancer.server.port=8080
 
       # Redirect all HTTP traffic to HTTPS
-      - traefik.http.routers.to-https.rule=HostRegexp(`{host:.+}`)
-      - traefik.http.routers.to-https.entrypoints=http
-      - traefik.http.routers.to-https.middlewares=to-https
+#      - traefik.http.routers.to-https.rule=HostRegexp(`{host:.+}`)
+#      - traefik.http.routers.to-https.entrypoints=web
+#      - traefik.http.routers.to-https.middlewares=to-https
 
       - traefik.http.middlewares.auth.basicauth.users=${TRAEFIK_USER}:${TRAEFIK_PASSWORD_HASH}
 
