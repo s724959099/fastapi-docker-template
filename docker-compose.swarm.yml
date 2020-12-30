@@ -6,7 +6,7 @@ services:
 
     ports:
       - "83:80"
-    image: fastapi-docker-template:0.0.1
+    image: fastapi-docker-template:0.0.2
     volumes:
       - ./app:/app
     # command: >

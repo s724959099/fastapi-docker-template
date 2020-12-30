@@ -26,7 +26,7 @@ app = FastAPI()
 
 @app.get('/')
 def index():
-    res = dict(data='ok')
+    res = dict(data='ok with v0.0.2')
     return JSONResponse(content=jsonable_encoder(res))
 
 
