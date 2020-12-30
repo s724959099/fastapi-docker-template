@@ -1,0 +1,40 @@
+version: '3'
+services:
+  web:
+    networks:
+      - traefik-public
+
+    ports:
+      - "83:80"
+    image: fastapi-docker-template:0.0.1
+    volumes:
+      - ./app:/app
+    # command: >
+    # bash -c "others & ./pd_start.sh"
+    deploy:
+      labels:
+        # Enable Traefik for this service, to make it available in the public network
+        - traefik.enable=true
+        - traefik.docker.network=traefik-public
+
+        # http host setting
+        - traefik.http.routers.webhttp.rule=Host(`${DOMAIN?Variable not set}`)
+        - traefik.http.routers.webhttp.entryPoints=http
+        - traefik.http.routers.webhttp.service=webhttp-service
+
+        # https setting
+        - traefik.http.routers.webhttps.rule=Host(`${DOMAIN?Variable not set}`)
+        - traefik.http.routers.webhttps.entrypoints=https
+        - traefik.http.routers.webhttps.tls=true
+        - traefik.http.routers.webhttps.tls.certresolver=le
+
+        # port setting
+        - traefik.http.services.webhttp-service.loadbalancer.server.port=80
+
+
+
+
+
+networks:
+  traefik-public:
+    external: true

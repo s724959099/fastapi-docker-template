@@ -1,0 +1,69 @@
+version: '3'
+
+services:
+  reverse-proxy:
+    # The official v2.0 Traefik docker image
+    image: traefik:v2.0
+    # Enables the web UI and tells Traefik to listen to docker
+    command:
+      - "--api.insecure=true"
+      # docker setting
+      - "--providers.docker"
+      - "--providers.docker.swarmMode=true"
+      - "--providers.docker.watch=true"
+      - "--providers.docker.exposedByDefault=false"
+      - "--providers.docker.endpoint=unix:///var/run/docker.sock"
+      - "--providers.docker.network=traefik-public"
+      # port setting
+      - "--entryPoints.http.address=:80"
+      - "--entrypoints.https.address=:443"
+      # ssl setting
+      - "--certificatesresolvers.le.acme.email=${EMAIL?Variable not set}"
+      - "--certificatesresolvers.le.acme.storage=acme.json"
+      - "--certificatesresolvers.le.acme.tlschallenge=true"
+      - "--certificatesResolvers.le.acme.httpChallenge=true"
+      - "--certificatesResolvers.le.acme.httpChallenge.entryPoint=http"
+    ports:
+      # The HTTP port
+      - "80:80"
+      # The Web UI (enabled by --api.insecure=true)
+      - "8080:8080"
+      - "443:443"
+    networks:
+      - traefik-public
+    volumes:
+      # So that Traefik can listen to the Docker events
+      - /var/run/docker.sock:/var/run/docker.sock
+      - ./acme.json:/acme.json
+    deploy:
+      labels:
+        # Enable Traefik for this service, to make it available in the public network
+        - traefik.enable=true
+        - traefik.docker.network=traefik-public
+        # admin auth
+        - traefik.http.middlewares.admin-auth.basicauth.users=${USERNAME?Variable not set}:${HASHED_PASSWORD?Variable not set}
+        - traefik.http.routers.traefik-public-https.middlewares=admin-auth
+
+
+        # http host setting
+        - traefik.http.routers.traefik-public-http.entrypoints=http
+        - traefik.http.routers.traefik-public-http.rule=Host(`traefik.${DOMAIN?Variable not set}`)
+
+        # https setting
+        - traefik.http.routers.traefik-public-https.rule=Host(`traefik.${DOMAIN?Variable not set}`)
+        - traefik.http.routers.traefik-public-https.entrypoints=https
+        - traefik.http.routers.traefik-public-https.tls=true
+        - traefik.http.routers.traefik-public-https.tls.certresolver=le
+
+        # port setting
+        - traefik.http.services.traefik-public.loadbalancer.server.port=8080
+
+        # http redirect to https
+        - traefik.http.middlewares.https-redirect.redirectscheme.scheme=https
+        - traefik.http.middlewares.https-redirect.redirectscheme.permanent=true
+        - traefik.http.routers.traefik-public-http.middlewares=https-redirect
+
+
+networks:
+  traefik-public:
+    external: true
